@@ -7,7 +7,7 @@ openai
 pymupdf 
 pytesseract 
 pdf2image 
-"pinecone[grpc]" 
+pinecone 
 --no-cache-dir sentence-transformers 
 langchain_pinecone
 fastapi
