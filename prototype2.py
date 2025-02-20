@@ -131,8 +131,7 @@ rag_chain = (
 )
 @app.get("/output/{input_msg}")
 def get_result(input_msg:str):
-    input_sen=input(input_msg)
-    response = rag_chain.invoke(input_sen)
+    response = rag_chain.invoke(input_msg)
     return {"message":response}
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 4000))  # ✅ Render expects port 10000
