@@ -8,7 +8,7 @@ pymupdf
 pytesseract 
 pdf2image 
 pinecone 
---no-cache-dir sentence-transformers 
+sentence-transformers 
 langchain_pinecone
 fastapi
 uvicorn
