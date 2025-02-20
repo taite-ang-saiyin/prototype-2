@@ -8,8 +8,8 @@ from pinecone import Pinecone
 from pinecone.grpc import PineconeGRPC as Pinecone
 from pinecone import ServerlessSpec
 from sentence_transformers import SentenceTransformer
-from langchain.vectorstores import Pinecone as pine
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Pinecone as pine
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain.prompts import ChatPromptTemplate,PromptTemplate
 from langchain import hub
@@ -24,7 +24,7 @@ import uvicorn
 
 app=FastAPI()
 
-pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+
 
 def Extract_text_from_digital_pdf(pdf_path):
   loader=PyMuPDFLoader(pdf_path)
@@ -96,16 +96,7 @@ def VectorStoring(splits,embeddings):
       namespace="p3-p6-namespace"
   )
 
-embedding_model=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-index=pc.Index('new-hybrid-index')
-vectorstore = PineconeVectorStore(index_name='new-hybrid-index', embedding=embedding_model, namespace="p3-p6-namespace")
-
-retriever1 = RunnableLambda(lambda query: vectorstore.similarity_search(str(query)))
-
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
-)
 def gpt_function(prompt_text:str)->str:
   completion = client.chat.completions.create(
     model="gpt-4o",
@@ -123,7 +114,6 @@ prompt = ChatPromptTemplate.from_template(
 
 rag_chain = (
     {"context": retriever1 | format_docs, "question": RunnablePassthrough()}
-    | RunnableLambda(debug_context)
     | prompt
     | llm
     | StrOutputParser()
@@ -133,4 +123,28 @@ def get_result():
     input_sen=input(input_msg)
     response = rag_chain.invoke(input_sen)
     return {"message":response}
-              
+if __name__ == "__main__":
+    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+    embedding_model=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+  
+    index=pc.Index('new-hybrid-index')
+    vectorstore = PineconeVectorStore(index_name='new-hybrid-index', embedding=embedding_model, namespace="p3-p6-namespace")
+    
+    retriever1 = RunnableLambda(lambda query: vectorstore.similarity_search(str(query)))
+    
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY")
+    )
+    llm=RunnableLambda(gpt_function)
+    prompt = ChatPromptTemplate.from_template(
+        "You are a teacher assistant in charge of making notes that would be used to teach students of Primary level in Singapore Science. Ensure your notes follow a good format that would introduce the topic from foundation up. You are to strictly use the context provided to you and answer the questions and not miss out any details. Think and generate like a teacher conducting a class for Primary school kids.\n\ncontext:{context}\n\nquestoin:{question}"
+    )
+    
+    rag_chain = (
+        {"context": retriever1 | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    port = int(os.environ.get("PORT", 10000))  # ✅ Render expects port 10000
+    uvicorn.run(app, host="0.0.0.0", port=port)     
