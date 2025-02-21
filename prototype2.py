@@ -111,7 +111,7 @@ def gpt_function(prompt_text:str)->str:
 
 embedding_model=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")  
 index=pc.Index('new-hybrid-index')
-vectorstore = PineconeVectorStore(index_name='new-hybrid-index', embedding=embedding_model, namespace="p3-p6-namespace")
+vectorstore = PineconeVectorStore(index_name='new-hybrid-index', embedding=embedding_model, namespace="final-note-namespace")
 
 retriever1 = RunnableLambda(lambda query: vectorstore.similarity_search(str(query)))
 
