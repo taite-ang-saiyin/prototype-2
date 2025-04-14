@@ -13,4 +13,3 @@ langchain_pinecone
 fastapi
 uvicorn
 weaviate-client
-pydantic
