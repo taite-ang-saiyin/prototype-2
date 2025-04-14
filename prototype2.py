@@ -143,9 +143,9 @@ def get_result(input_msg:str):
     return {"message":response}
 
 class QuestionRequest(BaseModel):
-    level : str
-    difficulty : str 
-    subject : str
+    level: str
+    difficulty: str
+    subject: str
 
 def retrieve_notes_from_weaviate(query: str) -> List[Dict]:
     client = weaviate.connect_to_weaviate_cloud(
