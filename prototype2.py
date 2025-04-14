@@ -104,9 +104,9 @@ def VectorStoring(splits,embeddings):
 
 
 def gpt_function(prompt_text:str)->str:
-    client = OpenAI(
-        api_key=os.environ.get("OPENAI_API_KEY")
-    )
+  client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+  )
   completion = client.chat.completions.create(
     model="gpt-4o",
     store=True,
