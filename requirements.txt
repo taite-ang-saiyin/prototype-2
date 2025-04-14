@@ -12,3 +12,4 @@ sentence-transformers
 langchain_pinecone
 fastapi
 uvicorn
+weaviate-client
