@@ -2,6 +2,7 @@ import os
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
 import pytesseract
+from pydantic import BaseModel
 from pdf2image import convert_from_path
 from langchain.schema import Document
 from pinecone import Pinecone
