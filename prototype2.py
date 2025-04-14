@@ -104,6 +104,9 @@ def VectorStoring(splits,embeddings):
 
 
 def gpt_function(prompt_text:str)->str:
+    client = OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY")
+    )
   completion = client.chat.completions.create(
     model="gpt-4o",
     store=True,
@@ -184,7 +187,6 @@ def getQuizResponse(level,difficulty,subject):
     client = OpenAI(
       api_key=os.environ["OPENAI_API_KEY"]
     )
-    difficulty="hard"
     input_sen=f"give me 30 {difficulty} mcqs on {subject} for {level} level"
     llm=RunnableLambda(gpt_function)
     prompt = ChatPromptTemplate.from_template(
