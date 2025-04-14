@@ -171,7 +171,10 @@ def debug_context(x):
     print("🔎 Retrieved Context:\n")
     print(x)
     return x
-
+    
+def format_docs_1(docs):
+    return "\n\n".join(doc['question'] for doc in docs)
+    
 def getQuizResponse(level,difficulty,subject):
     retriever1 = RunnableLambda(
         lambda query: retrieve_notes_from_weaviate(query)
@@ -188,7 +191,7 @@ def getQuizResponse(level,difficulty,subject):
         "You are a teacher assistant in charge of giving questions that would be used to teach students of Primary level in Singapore Science. Ensure your questions follow a good format that would introduce the topic from foundation up. You are to strictly use the context provided to you and answer the questions and not miss out any details. Think and generate like a teacher conducting a class for Primary school kids.Don't include introduction or conclusion and just give only the extracted questions from the context.\n\ncontext:{context}\n\nquestoin:{question}"
     )
     rag_chain = (
-        {"context": retriever1 | format_docs, "question": RunnablePassthrough()}
+        {"context": retriever1 | format_docs_1, "question": RunnablePassthrough()}
         | debug_node
         | prompt
         | llm
