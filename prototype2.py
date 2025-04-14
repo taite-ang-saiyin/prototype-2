@@ -194,7 +194,7 @@ def getQuizResponse(level,difficulty,subject):
         | llm
         | StrOutputParser()
     )
-    result=rag_chain.invoke(iput_sen)
+    result=rag_chain.invoke(input_sen)
     return result
 @app.post("/generate")
 async def generate_mcqs(request: QuestionRequest):
