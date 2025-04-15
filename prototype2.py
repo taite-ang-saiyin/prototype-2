@@ -117,28 +117,45 @@ def gpt_function(prompt_text:str)->str:
   return completion.choices[0].message.content
 
 def getnoteresponse(user_input):
-    embedding_model=HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")  
-    index=pc.Index('new-hybrid-index')
-    vectorstore = PineconeVectorStore(index_name='new-hybrid-index', embedding=embedding_model, namespace="final-note-namespace")
+    print("🔧 Starting getnoteresponse for:", user_input)
     
-    retriever1 = RunnableLambda(lambda query: vectorstore.similarity_search(str(query)))
+    try:
+        embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        print("✅ HuggingFace model loaded")
     
-    client = OpenAI(
-        api_key=os.environ.get("OPENAI_API_KEY")
-    )
-    llm=RunnableLambda(gpt_function)
-    prompt = ChatPromptTemplate.from_template(
-        "You are a teacher assistant in charge of making notes that would be used to teach students of Primary level in Singapore Science. Ensure your notes follow a good format that would introduce the topic from foundation up. You are to strictly use the context provided to you and answer the questions and not miss out any details. Think and generate like a teacher conducting a class for Primary school kids.\n\ncontext:{context}\n\nquestoin:{question}"
-    )
+        index = pc.Index('new-hybrid-index')
+        print("✅ Pinecone index accessed")
     
-    rag_chain = (
-        {"context": retriever1 | format_docs, "question": RunnablePassthrough()}
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-    response = rag_chain.invoke(user_input)
-    return response
+        vectorstore = PineconeVectorStore(
+            index_name='new-hybrid-index',
+            embedding=embedding_model,
+            namespace="final-note-namespace"
+        )
+        print("✅ Vectorstore initialized")
+    
+        retriever1 = RunnableLambda(lambda query: vectorstore.similarity_search(str(query)))
+    
+        prompt = ChatPromptTemplate.from_template(
+            "You are a teacher assistant in charge of making notes that would be used to teach students of Primary level in Singapore Science. Ensure your notes follow a good format that would introduce the topic from foundation up. You are to strictly use the context provided to you and answer the questions and not miss out any details. Think and generate like a teacher conducting a class for Primary school kids.\n\ncontext:{context}\n\nquestoin:{question}"
+        )
+    
+        rag_chain = (
+            {"context": retriever1 | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | RunnableLambda(gpt_function)
+            | StrOutputParser()
+        )
+    
+        response = rag_chain.invoke(user_input)
+        print("✅ LangChain RAG chain executed")
+        return response
+    
+    except Exception as e:
+        import traceback
+        print("❌ Error in getnoteresponse():")
+        traceback.print_exc()
+        return "Error generating response"
+
     
 @app.get("/output/{input_msg}")
 def get_result(input_msg:str):
