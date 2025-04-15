@@ -3,7 +3,7 @@ tiktoken
 langchain-openai
 langchainhub
 huggingface_hub[hf_xet]
-langchain_huggingface
+langchain-huggingface
 langchain
 openai
 pymupdf
