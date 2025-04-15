@@ -10,7 +10,7 @@ from pinecone.grpc import PineconeGRPC as Pinecone
 from pinecone import ServerlessSpec
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores import Pinecone as pine
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain-huggingface import HuggingFaceEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain.prompts import ChatPromptTemplate,PromptTemplate
 from langchain import hub
